@@ -10,10 +10,10 @@ data class MahasiswaData(
     val npm: String,
     val nama: String,
     val tanggal_lahir: String,
-    val jenis_kelamin: String,
+    val jenis_kelamin: String
 ) {
     enum class JenisKelamin {
         Lelaki,
-        Perempuan
+        Perempuan,
     }
 }
