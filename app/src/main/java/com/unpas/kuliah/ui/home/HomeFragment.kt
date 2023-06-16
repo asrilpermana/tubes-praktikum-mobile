@@ -42,14 +42,14 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        // Menyembunyikan tombol appBarMain
+        // Hide tombol appBarMain
         (requireActivity() as AppCompatActivity).findViewById<FloatingActionButton>(R.id.fab).hide()
     }
 
     override fun onPause() {
         super.onPause()
 
-        // Menampilkan kembali tombol appBarMain
+        // Shows tombol appBarMain
         (requireActivity() as AppCompatActivity).findViewById<FloatingActionButton>(R.id.fab).show()
     }
 

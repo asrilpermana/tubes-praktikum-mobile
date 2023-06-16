@@ -31,7 +31,7 @@
 
     <fragment
         android:id="@+id/nav_anggota"
-        android:name="com.unpas.kuliah.ui.anggota.AnggotaFragment"
+        android:name="com.unpas.kuliah.ui.mahasiswa.anggota.AnggotaFragment"
         android:label="@string/menu_anggota"
         tools:layout="@layout/fragment_anggota" />
 </navigation>

@@ -92,7 +92,7 @@ class MahasiswaFragment : Fragment() {
             val jenisKelaminText = bottomSheetView.findViewById<Spinner>(R.id.jenisKelaminText)
             val button = bottomSheetView.findViewById<Button>(R.id.mahasiswaButton)
 
-            // Inisialisasi Spinner
+            // Menginisialisasi Spinner
             val jenisKelaminAdapter = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_spinner_item,
@@ -119,7 +119,7 @@ class MahasiswaFragment : Fragment() {
                 CoroutineScope(Dispatchers.IO).launch {
                     db.mahasiswaDao().insertMahasiswa(mahasiswaData)
 
-                    // Tambahkan data ke endpoint menggunakan Retrofit
+                    // add data ke endpoint menggunakan Retrofit
                     try {
                         val response = mahasiswaApi.addMahasiswa(mahasiswaData)
                         if (response.isSuccessful) {
