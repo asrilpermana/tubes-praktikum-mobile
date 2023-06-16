@@ -2,6 +2,7 @@ package com.unpas.kuliah.ui.mahasiswa
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -45,22 +46,25 @@ class MahasiswaFragment : Fragment() {
         val tableLayout: TableLayout = root.findViewById(R.id.tableLayout)
         val horizontalScrollView: HorizontalScrollView = root.findViewById(R.id.horizontalScrollView)
 
-        val refreshButton: FloatingActionButton = root.findViewById(R.id.refreshButton)
-        refreshButton.setOnClickListener {
-            refreshMahasiswaList()
-        }
-
         CoroutineScope(Dispatchers.IO).launch {
             val mahasiswaList = db.mahasiswaDao().getAllMahasiswas()
 
             requireActivity().runOnUiThread {
-                for (mahasiswa in mahasiswaList) {
+                for (index in mahasiswaList.indices) {
+                    val mahasiswa = mahasiswaList[index]
                     val tableRow = TableRow(requireContext())
 
                     val npmCell = createTableCell(mahasiswa.npm)
                     val namaCell = createTableCell(mahasiswa.nama)
                     val tanggalLahirCell = createTableCell(mahasiswa.tanggal_lahir)
                     val jenisKelaminCell = createTableCell(mahasiswa.jenis_kelamin)
+
+                    // Set warna latar belakang
+                    if (index % 2 == 0) {
+                        tableRow.setBackgroundColor(Color.parseColor("#A5C0DD"))
+                    } else {
+                        tableRow.setBackgroundColor(Color.parseColor("#6C9BCF"))
+                    }
 
                     tableRow.addView(npmCell)
                     tableRow.addView(namaCell)
@@ -96,7 +100,7 @@ class MahasiswaFragment : Fragment() {
             val jenisKelaminAdapter = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_spinner_item,
-                MahasiswaData.JenisKelamin.values().map { it.name }
+                MahasiswaData.JenisKelamin.values().map { it.jenis }
             )
 
             jenisKelaminText.adapter = jenisKelaminAdapter
@@ -112,7 +116,20 @@ class MahasiswaFragment : Fragment() {
                 val npm = npmText.text.toString()
                 val nama = namaText.text.toString()
                 val tanggalLahir = tanggalLahirText.text.toString()
-                val jenisKelamin = jenisKelaminText.selectedItem.toString()
+                val jenisKelamin = when (jenisKelaminText.selectedItem.toString()) {
+                    MahasiswaData.JenisKelamin.Lakilaki.jenis -> MahasiswaData.JenisKelamin.Lakilaki.jenis
+                    MahasiswaData.JenisKelamin.Perempuan.jenis -> MahasiswaData.JenisKelamin.Perempuan.jenis
+                    else -> ""
+                }
+
+                // Memeriksa apakah ada input yang kosong
+                if (npm.isEmpty() || nama.isEmpty() || tanggalLahir.isEmpty() || jenisKelamin.isBlank() ||
+                    jenisKelamin !in MahasiswaData.JenisKelamin.values().map { it.jenis }) {
+                    requireActivity().runOnUiThread {
+                        showToast("Harap isi semua data terlebih dahulu")
+                    }
+                    return@setOnClickListener
+                }
 
                 val mahasiswaData = MahasiswaData(0, npm, nama, tanggalLahir, jenisKelamin)
 
@@ -125,15 +142,23 @@ class MahasiswaFragment : Fragment() {
                         if (response.isSuccessful) {
                             bottomSheetDialog.dismiss()
                         } else {
-                            showToast("Gagal menambahkan data ke server")
+                            requireActivity().runOnUiThread {
+                                showToast("Gagal menambahkan data ke server")
+                            }
                         }
                     } catch (e: Exception) {
-                        showToast("Gagal menambahkan data ke server: ${e.message}")
+                        requireActivity().runOnUiThread {
+                            showToast("Gagal menambahkan data ke server: ${e.message}")
+                        }
                     }
                 }
 
                 bottomSheetDialog.dismiss()
-                showToast("Data berhasil ditambahkan")
+                requireActivity().runOnUiThread {
+                    showToast("Data berhasil ditambahkan")
+                }
+
+                refreshMahasiswaList()
             }
 
             bottomSheetDialog.setContentView(bottomSheetView)
@@ -176,13 +201,21 @@ class MahasiswaFragment : Fragment() {
                 // Remove all views except the header row
                 tableLayout.removeViews(1, childCount - 1)
 
-                for (mahasiswa in mahasiswaList) {
+                for (index in mahasiswaList.indices) {
+                    val mahasiswa = mahasiswaList[index]
                     val tableRow = TableRow(requireContext())
 
                     val npmCell = createTableCell(mahasiswa.npm)
                     val namaCell = createTableCell(mahasiswa.nama)
                     val tanggalLahirCell = createTableCell(mahasiswa.tanggal_lahir)
                     val jenisKelaminCell = createTableCell(mahasiswa.jenis_kelamin)
+
+                    // Set warna latar belakang
+                    if (index % 2 == 0) {
+                        tableRow.setBackgroundColor(Color.parseColor("#59CE8F"))
+                    } else {
+                        tableRow.setBackgroundColor(Color.parseColor("#8BC34A"))
+                    }
 
                     tableRow.addView(npmCell)
                     tableRow.addView(namaCell)
@@ -206,7 +239,7 @@ class MahasiswaFragment : Fragment() {
     private fun createTableCell(text: String): TextView {
         val textView = TextView(requireContext())
         textView.text = text
-        textView.setPadding(72, 16, 16, 16)
+        textView.setPadding(45, 16, 16, 16)
         return textView
     }
 
@@ -257,6 +290,14 @@ class MahasiswaFragment : Fragment() {
             val updatedInput3 = tanggalLahirText.text.toString()
             val updatedInput5 = jenisKelaminText.selectedItem.toString()
 
+            // Memeriksa apakah ada input yang kosong
+            if (updatedInput1.isEmpty() || updatedInput2.isEmpty() || updatedInput3.isEmpty() || updatedInput5.isEmpty()) {
+                requireActivity().runOnUiThread {
+                    showToast("Harap isi semua data terlebih dahulu")
+                }
+                return@setOnClickListener
+            }
+
             CoroutineScope(Dispatchers.IO).launch {
                 val updatedMahasiswa = mahasiswa.copy(
                     npm = updatedInput1,
@@ -268,7 +309,11 @@ class MahasiswaFragment : Fragment() {
             }
 
             bottomSheetDialog.dismiss()
-            showToast("Data telah diperbarui")
+            requireActivity().runOnUiThread {
+                showToast("Data telah diperbarui")
+            }
+
+            refreshMahasiswaList()
         }
 
         bottomSheetDialog.setContentView(bottomSheetView)
@@ -297,9 +342,10 @@ class MahasiswaFragment : Fragment() {
             .setPositiveButton("Ya") { dialog, id ->
                 CoroutineScope(Dispatchers.IO).launch {
                     db.mahasiswaDao().deleteMahasiswa(mahasiswa)
+                    refreshMahasiswaList()
                 }
                 dialog.dismiss()
-                showToast("Data telah dihapus") // Custom function to show a toast
+                showToast("Data telah dihapus")
             }
             .setNegativeButton("Tidak") { dialog, id ->
                 dialog.dismiss()

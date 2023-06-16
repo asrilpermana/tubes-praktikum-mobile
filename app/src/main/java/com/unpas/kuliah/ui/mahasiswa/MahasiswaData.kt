@@ -11,10 +11,9 @@ data class MahasiswaData(
     val nama: String,
     val tanggal_lahir: String,
     val jenis_kelamin: String,
-    val agama: String,
 ) {
-    enum class JenisKelamin {
-        Lelaki,
-        Perempuan,
+    enum class JenisKelamin(val jenis: String) {
+        Lakilaki("Laki-laki"),
+        Perempuan("Perempuan")
     }
 }

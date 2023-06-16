@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 class HomeViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "Selamat Datang di perkuliahan Universitas Pasundan"
+        value = "Selamat Datang!"
     }
     val text: LiveData<String> = _text
 }
