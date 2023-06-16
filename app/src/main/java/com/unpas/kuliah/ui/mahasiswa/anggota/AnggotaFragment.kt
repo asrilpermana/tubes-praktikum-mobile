@@ -1,4 +1,4 @@
-package com.unpas.kuliah.ui.anggota
+package com.unpas.kuliah.ui.mahasiswa.anggota
 
 import android.os.Bundle
 import android.view.LayoutInflater
